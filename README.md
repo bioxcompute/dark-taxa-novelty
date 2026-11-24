@@ -62,7 +62,7 @@ of two models sit on different scales.
 
 Counting four-letter words. Take the 4-mer profile of a query, compare it to one
 centroid per reference group, and keep the nearest. No training, no weights, no
-GPU, and it runs in about twenty seconds on a laptop.
+GPU, and it runs in under three seconds on a laptop.
 
 `baseline.py` in this repository is that method, in one file, with numpy as its
 only dependency. Every number below came out of it, measured on the files beside
