@@ -38,6 +38,7 @@ a number measured today still means something next year.
 | `known.fasta` | 400 queries from those same groups, not in the reference set |
 | `novel.fasta` | 400 queries from 40 taxa held out entirely |
 | `benchmark.json` | the held-out taxa, the counts, and the exact split |
+| `baseline.py` | the baseline below, in one file, numpy and nothing else |
 
 Every sequence carries its accession, its source database and its taxon in the
 FASTA header. 1,665 of 1,760 could be traced back to an accession; the rest
@@ -59,20 +60,42 @@ of two models sit on different scales.
 
 ## The baseline to beat
 
-Counting four-letter words. Take the 4-mer profile of a query and compare it to
-one centroid per reference group, then take the nearest.
+Counting four-letter words. Take the 4-mer profile of a query, compare it to one
+centroid per reference group, and keep the nearest. No training, no weights, no
+GPU, and it runs in about twenty seconds on a laptop.
 
-**One centroid per group, not the nearest single reference sequence.** That
-choice moves the number by about 0.09, which is more than most models differ by.
-Taking the nearest single sequence rewards a query that happens to resemble one
-odd record, and gives a large group more chances to win simply by being large.
+`baseline.py` in this repository is that method, in one file, with numpy as its
+only dependency. Every number below came out of it, measured on the files beside
+it on 24 November 2026, so you can reproduce the row you want to beat before you
+try to beat it.
 
-On this set, that baseline reaches **AUC 0.755, interval [0.720, 0.786]**.
+| method | length | AUC | 95% over rows | 95% over taxa |
+|---|---|---|---|---|
+| one centroid per group | 300 bases | **0.7329** | [0.6976, 0.7674] | [0.6249, 0.8369] |
+| one centroid per group | 512 bases | **0.7578** | [0.7225, 0.7910] | [0.6426, 0.8680] |
+| one centroid per group | full read | **0.7741** | [0.7389, 0.8075] | [0.6578, 0.8874] |
+| nearest single sequence | full read | 0.8022 | [0.7690, 0.8350] | [0.6727, 0.9174] |
 
-If you see a different number for counting, the difference is in how the
-sequences are cropped, not in the model. We report 0.774 elsewhere for the same
-baseline on full-length reads; that is the same method on longer input. Crop
-every model the same way and the comparison holds.
+Guessing is 0.5000. The median sequence here is about 1,450 bases, so "full
+read" is roughly three times the longest crop.
+
+**More context helps, and it helps monotonically**: 0.7329, 0.7578, 0.7741 as
+the crop goes from 300 to 512 to the whole read, with nothing else changed. That
+is why a model read at one length may only be compared with a baseline measured
+at that same length. An extra 212 bases is worth about 0.025 AUC here, which is
+larger than the gap between several published models.
+
+**One centroid per group, not the nearest single reference sequence.** Taking the
+nearest single sequence rewards a query that happens to resemble one odd record,
+and gives a large group more chances to win simply by being large. Measured, that
+choice is worth 0.0281 and it goes *up*, not down: 0.8022 against 0.7741. So the
+row we ask you to beat is the more conservative of the two, and `--nearest` runs
+it the other way if you want to see that for yourself.
+
+An earlier version of this file said 0.755 for this baseline and put the centroid
+choice at "about 0.09". Neither survived being measured on the published files.
+The number was close to the 512-base crop and the 0.09 was three times too large,
+so this paragraph is here instead of a quiet edit.
 
 ## How the split was made
 
