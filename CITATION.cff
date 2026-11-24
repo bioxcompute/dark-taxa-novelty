@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: "Dark taxa novelty, v1.0: a frozen benchmark for recognising unseen taxa in marine eDNA"
+message: "If you report a number on this set, please cite it and say which crop you used."
+type: dataset
+authors:
+  - family-names: Snooij
+    given-names: Niels Karel
+    orcid: "https://orcid.org/0009-0001-3411-1062"
+    affiliation: bioX
+version: "1.0"
+date-released: "2026-09-22"
+license: CC-BY-4.0
+url: "https://github.com/bioxcompute/dark-taxa-novelty"
+keywords:
+  - environmental DNA
+  - novelty detection
+  - 18S rRNA
+  - open-set recognition
+  - benchmark
+abstract: >-
+  1,760 marker-gene sequences from SILVA and PR2, split so that forty whole
+  taxonomic groups are held out entirely, for measuring whether a model can
+  recognise a taxon it has never seen. The baseline to beat is counting
+  four-letter words against one centroid per reference group: AUC 0.7741 on
+  full reads, 0.7578 at 512 bases and 0.7329 at 300 bases, measured by the
+  sixty-line baseline.py in the same repository. Four published DNA foundation
+  models do not beat it. Whole taxa are held out rather than random rows,
+  because sequences within one taxon are not independent and a random split
+  lets a model answer from memory and call it recognition.
